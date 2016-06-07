@@ -45,9 +45,14 @@ module Q03
   def run
     cards = COUNT.times.map { |i| false }
     COUNT.times do |i|
-      start = i + 1
-      step = i + 2
-      (start..COUNT).step(step).each do |j|
+      Enumerator.new do |y|
+        x = i + 1
+        step = i + 2
+        while x < COUNT
+          y << x
+          x += step
+        end
+      end.each do |j|
         cards[j] = !cards[j]
       end
     end
