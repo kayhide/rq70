@@ -4,8 +4,8 @@ require 'pry'
 module Q09
   MALE = 20
   FEMALE = 10
-  # MALE = 10
-  # FEMALE = 5
+  # MALE = 6
+  # FEMALE = 3
 
   module_function
 
@@ -32,8 +32,21 @@ module Q09
     state == [MALE, FEMALE]
   end
 
+  def count states
+    if done? states.last
+      1
+    elsif valid? states.last
+      count(states + [[states.last[0] + 1, states.last[1]]]) +
+        count(states + [[states.last[0], states.last[1] + 1]])
+    else
+      0
+    end
+  end
+
+
   def run
-    patterns([[0, 0]]).count
+    # patterns([[0, 0]]).count
+    count([[0, 0]])
   end
 end
 
