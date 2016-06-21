@@ -15,8 +15,19 @@ module Q17
     end
   end
 
+  def count queue
+    if queue.count == COUNT
+      1
+    elsif queue.last == :female
+      count([*queue, :mail])
+    else
+      count([*queue, :mail]) + count([*queue, :female])
+    end
+  end
+
   def run
-    patterns([]).count
+    # patterns([]).count
+    count []
   end
 end
 
