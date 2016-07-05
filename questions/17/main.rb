@@ -25,9 +25,18 @@ module Q17
     end
   end
 
+  def solve boy, girl, left
+    if left == 0
+      boy + girl
+    else
+      solve boy + girl, boy, left - 1
+    end
+  end
+
   def run
     # patterns([]).count
-    count []
+    # count []
+    solve 1, 1, COUNT - 1
   end
 end
 
