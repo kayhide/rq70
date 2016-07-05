@@ -25,7 +25,8 @@ module Q11
     n % sum == 0
   end
 
-  def run
+  # lazy version
+  def run_
     enum = Enumerator.new do |y|
       i = 0
       loop do
@@ -35,6 +36,19 @@ module Q11
       end
     end
     enum.lazy.drop(8).take(5).to_a
+  end
+
+  # fast version
+  def run
+    a = b = 1
+    count = 0
+    ans = []
+    while ans.length < 11
+      c = a + b
+      ans << c if dividable? c
+      a, b = b, c
+    end
+    ans.drop(6)
   end
 end
 
