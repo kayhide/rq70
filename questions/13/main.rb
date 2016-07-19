@@ -8,23 +8,28 @@ module Q13
   RIGHT = 'SKILL'
 
   def to_num str, map
-    str.each_char.inject(0) { |memo, c| memo * 10 + map[c] }
+    @codepoints[str].inject(0) { |memo, c| memo * 10 + map[c] }
   end
 
-  def run
+  def numbers words
+    @codepoints = words.map { |str| [str, str.codepoints] }.to_h
+
     results = []
-    chars = [*LEFT, RIGHT].inject(:+).each_char.to_a.uniq
-    heads = [*LEFT, RIGHT].map { |str| str[0] }
+    chars = @codepoints.values.flatten.uniq
+    heads = @codepoints.values.map(&:first).uniq
     tails = chars - heads
     (1..9).to_a.permutation(heads.length).each do |xs|
       ((0..9).to_a - xs).permutation(tails.length).each do |ys|
-        map = (heads.zip(xs) + tails.zip(ys)).to_h
-        left = LEFT.map { |str| to_num(str, map) }
-        right = to_num(RIGHT, map)
-        results << [*left, right] if left.inject(:+) == right
+        map = (heads + tails).zip(xs + ys).to_h
+        nums = words.map { |str| to_num(str, map) }
+        results << nums if yield(nums)
       end
     end
     [results.length, *results]
+  end
+
+  def run
+    numbers([*LEFT, RIGHT]) { |nums| nums[0..-2].inject(:+) == nums[-1] }
   end
 end
 
