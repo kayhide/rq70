@@ -7,14 +7,20 @@ module Q13
   LEFT = %w(READ WRITE TALK)
   RIGHT = 'SKILL'
 
+  def to_num str, map
+    str.each_char.inject(0) { |memo, c| memo * 10 + map[c] }
+  end
+
   def run
     results = []
     chars = [*LEFT, RIGHT].inject(:+).each_char.to_a.uniq
-    (0..9).to_a.permutation(chars.length).each do |nums|
-      map = chars.zip(nums).to_h
-      if [*LEFT, RIGHT].none? { |word| map[word[0]] == 0 }
-        left = LEFT.map { |str| str.gsub(/./) { |s| map[s] }.to_i }
-        right = RIGHT.gsub(/./) { |s| map[s] }.to_i
+    heads = [*LEFT, RIGHT].map { |str| str[0] }
+    tails = chars - heads
+    (1..9).to_a.permutation(heads.length).each do |xs|
+      ((0..9).to_a - xs).permutation(tails.length).each do |ys|
+        map = (heads.zip(xs) + tails.zip(ys)).to_h
+        left = LEFT.map { |str| to_num(str, map) }
+        right = to_num(RIGHT, map)
         results << [*left, right] if left.inject(:+) == right
       end
     end
