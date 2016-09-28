@@ -51,16 +51,31 @@ module Q18
     squared_nums.include? nums.inject(:+)
   end
 
+  def chainable_nums
+    @chainable_nums ||= {}
+  end
+
+  def chainable? x, y
+    chainable_nums[x].include?(y)
+  end
+
+  def prepare_chainable_nums n
+    prepare_squared_nums n
+    (1..n).each do |i|
+      chainable_nums[i] = squared_nums.map { |sq| sq - i }.select(&:positive?)
+    end
+  end
+
   def try_create n
-    prepare_squared_nums 2 * n
+    prepare_chainable_nums 2 * n
     place [1], (2..n).to_a
   end
 
   def place pieces, left
     if left.empty?
-      squared?([pieces.first, pieces.last]) ? [pieces] : []
+      chainable?(pieces.last, pieces.first) ? [pieces] : []
     else
-      left.select { |p| squared? [pieces.last, p] }
+      (left & chainable_nums[pieces.last])
         .map { |p| place [*pieces, p], left - [p] }
         .inject([], :+)
     end
