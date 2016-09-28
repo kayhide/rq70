@@ -57,18 +57,12 @@ module Q18
   end
 
   def place pieces, left
-    if pieces.count < 2 || squared?(pieces.last(2))
-      if left.empty?
-        if squared?([pieces.first, pieces.last])
-          [pieces]
-        else
-          []
-        end
-      else
-        left.map { |p| place [*pieces, p], left - [p] }.inject(:+)
-      end
+    if left.empty?
+      squared?([pieces.first, pieces.last]) ? [pieces] : []
     else
-      []
+      left.select { |p| squared? [pieces.last, p] }
+        .map { |p| place [*pieces, p], left - [p] }
+        .inject([], :+)
     end
   end
 
