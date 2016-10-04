@@ -3,12 +3,16 @@ require 'benchmark'
 require 'pry'
 
 class Array
-  def to_composite_nums
+  def to_pairs
     [
-      first * first,
-      *each_cons(2).map { |x, y| x * y },
-      last * last
+      [first, first],
+      *each_cons(2),
+      [last, last]
     ]
+  end
+
+  def to_composite_nums
+    to_pairs.map { |x, y| x * y }
   end
 end
 
