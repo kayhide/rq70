@@ -14,11 +14,26 @@ module Q20
     end
   end
 
-  def run
+  def run_
     sum, nss = combinations(NUMBERS)
                  .group_by { |ns| ns.inject(:+) }
                  .max_by { |sum, nss| nss.count }
     [sum, nss.count]
+  end
+
+  def dynamic_count counts, nums
+    if nums.empty?
+      counts
+    else
+      n = nums.first
+      dynamic_count (Array.new(n, 0) + counts).zip(counts).map { |x, y| x + y.to_i },
+                    nums.drop(1)
+    end
+  end
+
+  def run
+    count, sum = dynamic_count([1], NUMBERS).each_with_index.max_by(&:first)
+    [sum, count]
   end
 end
 
