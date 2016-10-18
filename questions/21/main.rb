@@ -3,7 +3,7 @@ require 'pry'
 
 class Array
   def to_next_row
-    [false, *self].zip([*self, false]).map { |pair| pair.inject(:^) }
+    [false, *self].zip([*self, false]).map { |x, y| x ^ y }
   end
 end
 
