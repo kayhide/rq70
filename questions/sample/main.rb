@@ -1,4 +1,5 @@
 require 'benchmark'
+require 'pry'
 
 module Q00
   module_function
