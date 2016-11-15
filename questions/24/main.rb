@@ -23,24 +23,27 @@ module Q24
       end
   end
 
+  def panel_count
+    @panel_count ||= candidates.flatten.uniq.count
+  end
+
   def combinations shots, candidates
     if candidates.empty?
       completed?(shots) ? [shots] : []
     else
       shot = candidates.first
-      combinations([*shots, shot], except(candidates.drop(1), shot)) +
-        combinations(shots, candidates.drop(1))
+      next_candidates = candidates.drop(1)
+      combinations([*shots, shot], except(next_candidates, shot)) +
+        combinations(shots, next_candidates)
     end
   end
 
   def except shots, ns
-    ns.inject(shots) do |acc, elem|
-      acc.reject { |s| s.include? elem }
-    end
+    shots.reject { |s| (s & ns).any? }
   end
 
   def completed? shots
-    shots.flatten.uniq.count == candidates.flatten.uniq.count
+    shots.inject([], :+).count == panel_count
   end
 
   def run
