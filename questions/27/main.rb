@@ -6,6 +6,8 @@ module Q27
 
   # SIZE = [3, 2]
   SIZE = [6, 4]
+  WIDTH_RANGE = (0..SIZE[0])
+  HEIGHT_RANGE = (0..SIZE[1])
 
   class Point < Struct.new(:x, :y)
     def add dx, dy
@@ -13,7 +15,7 @@ module Q27
     end
 
     def inside?
-      (0..SIZE[0]).include?(x) && (0..SIZE[1]).include?(y)
+      WIDTH_RANGE.include?(x) && HEIGHT_RANGE.include?(y)
     end
 
     def goaled?
@@ -21,25 +23,31 @@ module Q27
     end
   end
 
-  def nexts path
-    p0, p1 = path.last(2)
-    case [p1.x - p0.x, p1.y - p0.y]
-    when [1, 0]
-      [p1.add(1, 0), p1.add(0, 1)]
-    when [0, 1]
-      [p1.add(0, 1), p1.add(-1, 0)]
-    when [-1, 0]
-      [p1.add(-1, 0), p1.add(0, -1)]
-    when [0, -1]
-      [p1.add(0, -1), p1.add(1, 0)]
+  class Path < Array
+    def nexts
+      p0, p1 = last(2)
+      case [p1.x - p0.x, p1.y - p0.y]
+      when [1, 0]
+        [p1.add(1, 0), p1.add(0, 1)]
+      when [0, 1]
+        [p1.add(0, 1), p1.add(-1, 0)]
+      when [-1, 0]
+        [p1.add(-1, 0), p1.add(0, -1)]
+      when [0, -1]
+        [p1.add(0, -1), p1.add(1, 0)]
+      end.select { |p| acceptable? p }
     end
-  end
 
-  def valid? path, p
-    p.inside? &&
-      path.each_cons(2).none? do |p0, p1|
-      (p0 == path.last && p1 == p) ||
-        (p1 == path.last && p0 == p)
+    def acceptable? p
+      p.inside? &&
+        each_cons(2).none? do |p0, p1|
+        (p0 == last && p1 == p) ||
+          (p1 == last && p0 == p)
+      end
+    end
+
+    def snoc p
+      Path.new(self) << p
     end
   end
 
@@ -47,14 +55,14 @@ module Q27
     if path.last.goaled?
       [path]
     else
-      nexts(path).select { |p| valid? path, p }
-                 .map { |p| move [*path, p]}
-                 .inject([], :+)
+      path.nexts
+          .map { |p| move path.snoc(p) }
+          .inject([], :+)
     end
   end
 
   def run
-    path = [Point.new(0, 0), Point.new(1, 0)]
+    path = Path.new [Point.new(0, 0), Point.new(1, 0)]
     res = move path
     res.count
   end
